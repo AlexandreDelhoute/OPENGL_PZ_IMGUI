@@ -1714,7 +1714,7 @@ void LevelMultiplierOFF()
 	jniEnv->CallVoidMethod(playerInstance, setLevelUpMultiplierId, 1.0f); // Activate xp multiplier
 }
 
-void AddXpToSkills()
+void TEST(int newLevel)
 {
 	const auto jvmHandle = GetModuleHandleW(L"jvm.dll");
 	if (jvmHandle == nullptr)
@@ -1747,156 +1747,50 @@ void AddXpToSkills()
 		std::cout << "[!] Failed to retrieve IsoPlayer class.\n";
 		return;
 	}
-	const auto perkFactoryClass = jniEnv->FindClass("zombie/characters/skills/PerkFactory");
-	if (perkFactoryClass == nullptr)
+	const auto PerkFactoryClass = jniEnv->FindClass("zombie/characters/skills/PerkFactory");
+	if (PerkFactoryClass == nullptr)
 	{
 		std::cout << "[!] Failed to retrieve PerkFactory class.\n";
 		return;
 	}
-	const auto IsoGameCharacterXPClass = jniEnv->FindClass("zombie/characters/IsoGameCharacter$XP");
-	if (IsoGameCharacterXPClass == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve IsoGameCharacterXP class.\n";
-		return;
-	}
-	const auto perkFactoryPerksClass = jniEnv->FindClass("zombie/characters/skills/PerkFactory$Perks");
-	if (perkFactoryPerksClass == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve IsoGameCharacterXP class.\n";
-		return;
-	}
-	const auto hasInstanceMethodId = jniEnv->GetStaticMethodID(isoPlayerClass, "hasInstance", "()Z");
+	const auto hasInstanceMethodId = jniEnv->GetStaticMethodID(PerkFactoryClass, "hasInstance", "()Z");
 	if (hasInstanceMethodId == nullptr)
 	{
-		std::cout << "[!] Failed to retrive IsoPlayer::hasInstance method.\n";
+		std::cout << "[!] Failed to retrive PerkFactory::hasInstance method.\n";
 		return;
 	}
 
-	const auto playerHasInstance = jniEnv->CallStaticBooleanMethod(isoPlayerClass, hasInstanceMethodId);
+	const auto playerHasInstance = jniEnv->CallStaticBooleanMethod(PerkFactoryClass, hasInstanceMethodId);
 	if (!playerHasInstance)
 	{
-		std::cout << "[!] IsoPlayer::hasInstance returned false.\n";
+		std::cout << "[!] PerkFactory::hasInstance returned false.\n";
 		return;
 	}
 
-	const auto getInstanceMethodId = jniEnv->GetStaticMethodID(isoPlayerClass, "getInstance", "()Lzombie/characters/IsoPlayer;");
+	const auto getInstanceMethodId = jniEnv->GetStaticMethodID(PerkFactoryClass, "getInstance", "()Lzombie/characters/skills/PerkFactory;");
 	if (getInstanceMethodId == nullptr)
 	{
-		std::cout << "[!] Failed to retrieve IsoPlayer::getInstance method.\n";
+		std::cout << "[!] Failed to retrieve PerkFactory::getInstance method.\n";
 		return;
 	}
 
-	const auto playerInstance = jniEnv->CallStaticObjectMethod(isoPlayerClass, getInstanceMethodId);
+	const auto playerInstance = jniEnv->CallStaticObjectMethod(PerkFactoryClass, getInstanceMethodId);
 	if (playerInstance == nullptr)
 	{
-		std::cout << "[!] IsoPlayer::getInstance returned nullptr!\n";
-		return;
-	}
-	const auto addXPMethodId = jniEnv->GetMethodID(IsoGameCharacterXPClass, "AddXP", "(Lzombie/characters/skills/PerkFactory$Perk;F)V");
-	if (addXPMethodId == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve IsoGameCharacter::AddXP method.\n";
-		return;
-	}
-	const auto aimingPerkFieldId = jniEnv->GetStaticFieldID(perkFactoryPerksClass, "aiming", "Lzombie/characters/skills/PerkFactory$Perk;");
-	if (aimingPerkFieldId == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve PerkFactory.aiming field.\n";
-			return;
-	}
-	const auto aimingPerkObject = jniEnv->GetStaticObjectField(perkFactoryPerksClass, aimingPerkFieldId);
-	if (aimingPerkObject == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve PerkFactory.aiming object.\n";
-		return;
-	}
-	jniEnv->CallVoidMethod(playerInstance, addXPMethodId, aimingPerkObject, 1000.0f);
-}
-
-void AddXpToSkills2()
-{
-	const auto jvmHandle = GetModuleHandleW(L"jvm.dll");
-	if (jvmHandle == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve handle for jvm.dll !\n";
-		return;
-	}
-	const auto jniGetCreatedJavaVMs = reinterpret_cast<jniGetCreatedJavaVMs_t>(GetProcAddress(
-		jvmHandle, "JNI_GetCreatedJavaVMs"));
-
-	JavaVM* javaVm = nullptr;
-	jniGetCreatedJavaVMs(&javaVm, 1, nullptr);
-	if (javaVm == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve created Java VMs!\n";
-		return;
-	}
-	JNIEnv* jniEnv = nullptr;
-
-	javaVm->AttachCurrentThread(reinterpret_cast<void**>(&jniEnv), nullptr);
-	if (jniEnv == nullptr)
-	{
-		std::cout << "[!] Failed to attach to the Java VM.\n";
-		return;
-	}
-	const auto isoPlayerClass = jniEnv->FindClass("zombie/characters/IsoPlayer");
-	if (isoPlayerClass == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve IsoPlayer class.\n";
-		return;
-	}
-	const auto hasInstanceMethodId = jniEnv->GetStaticMethodID(isoPlayerClass, "hasInstance", "()Z");
-	if (hasInstanceMethodId == nullptr)
-	{
-		std::cout << "[!] Failed to retrive IsoPlayer::hasInstance method.\n";
+		std::cout << "[!] PerkFactory::getInstance returned nullptr!\n";
 		return;
 	}
 
-	const auto playerHasInstance = jniEnv->CallStaticBooleanMethod(isoPlayerClass, hasInstanceMethodId);
-	if (!playerHasInstance)
+	const auto addXpMethodId = jniEnv->GetMethodID(isoPlayerClass, "addXp", "(Z)V");
+	if (addXpMethodId == nullptr)
 	{
-		std::cout << "[!] IsoPlayer::hasInstance returned false.\n";
+		std::cout << "[!] Failed to retrieve IsoPlayer::addXp method.\n";
 		return;
 	}
 
-	const auto getInstanceMethodId = jniEnv->GetStaticMethodID(isoPlayerClass, "getInstance", "()Lzombie/characters/IsoPlayer;");
-	if (getInstanceMethodId == nullptr)
-	{
-		std::cout << "[!] Failed to retrieve IsoPlayer::getInstance method.\n";
-		return;
-	}
 
-	const auto playerInstance = jniEnv->CallStaticObjectMethod(isoPlayerClass, getInstanceMethodId);
-	if (playerInstance == nullptr)
-	{
-		std::cout << "[!] IsoPlayer::getInstance returned nullptr!\n";
-		return;
-	}
-	const auto perkFactoryClass = jniEnv->FindClass("zombie/characters/skills/PerkFactory");
-	if (perkFactoryClass == nullptr) {
-		std::cout << "[!] Failed to retrieve PerkFactory Class.\n";
-		return;
-	}
-
-	const auto aimingPerk = jniEnv->GetStaticObjectField(perkFactoryClass, jniEnv->GetStaticFieldID(perkFactoryClass, "AIMING", "Lzombie/characters/skills/PerkType;"));
-	if (aimingPerk == nullptr) {
-		std::cout << "[!] Failed to retrieve Aiming Field.\n";
-		return;
-	}
-
-	const auto xpClass = jniEnv->FindClass("zombie/characters/IsoGameCharacter$XP");
-	if (xpClass == nullptr) {
-		std::cout << "[!] Failed to retrieve IsoGameCharacterXP Class.\n";
-		return;
-	}
-
-	const auto addXPMethod = jniEnv->GetMethodID(xpClass, "AddXP", "(Lzombie/characters/skills/PerkType;F)V");
-	if (addXPMethod == nullptr) {
-		std::cout << "[!] Failed to retrieve IsoGameCharacterXP::AddXP Method.\n";
-		return;
-	}
-
-	jniEnv->CallVoidMethod(playerInstance, addXPMethod, aimingPerk, 1000.0f);
+	jstring skillName = jniEnv->NewStringUTF("Aiming");
+	jniEnv->CallVoidMethod(playerInstance, addXpMethodId, skillName, 5000);
 }
 
 
@@ -2268,12 +2162,9 @@ BOOL __stdcall hkSwapBuffers(_In_ HDC hDc)
 		}
 		if (ImGui::Button("TEST"))
 		{
-			AddXpToSkills();
+			TEST(3);
 		}
-		if (ImGui::Button("TEST2"))
-		{
-			AddXpToSkills2();
-		}
+
         ImGui::End(); //END MENU
     }
 
